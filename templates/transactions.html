@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% block title %}Transactions{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2"><h2 class="mb-0">Transactions</h2><div class="d-flex gap-2">
+{% if undo_available %}<form method="post" action="{{ url_for('undo') }}"><button class="btn btn-outline-secondary"><i class="bi bi-arrow-counterclockwise"></i> Undo last action</button></form>{% endif %}
+<a href="{{ url_for('add_transaction') }}" class="btn btn-brand"><i class="bi bi-plus-lg"></i> Add</a></div></div>
+<form class="card-box mb-3 row g-2" method="get">
+<div class="col-md-3"><input name="q" class="form-control" placeholder="Search description or notes" value="{{ args.get('q','') }}"></div>
+<div class="col-6 col-md-2"><select name="type" class="form-select"><option value="">All types</option>{% for x in ['Income','Expense'] %}<option {{ 'selected' if args.get('type')==x }}>{{ x }}</option>{% endfor %}</select></div>
+<div class="col-6 col-md-2"><select name="category" class="form-select"><option value="">All categories</option>{% for c in categories %}<option {{ 'selected' if args.get('category')==c }}>{{ c }}</option>{% endfor %}</select></div>
+<div class="col-6 col-md-2"><input type="date" name="date" class="form-control" value="{{ args.get('date','') }}" title="Exact date"></div>
+<div class="col-6 col-md-2"><input type="month" name="month" class="form-control" value="{{ args.get('month','') }}"></div>
+<div class="col-md-3"><select name="sort" class="form-select">{% for v,l in [('latest','Latest'),('oldest','Oldest'),('high','Highest amount'),('low','Lowest amount'),('category','Category')] %}<option value="{{ v }}" {{ 'selected' if args.get('sort','latest')==v }}>Sort: {{ l }}</option>{% endfor %}</select></div>
+<div class="col-md-3 d-flex gap-2"><button class="btn btn-brand">Apply</button><a class="btn btn-light" href="{{ url_for('transactions') }}">Reset</a></div></form>
+<div class="card-box"><p class="text-muted small">Showing {{ txs|length }} of {{ total }}</p><div class="table-responsive"><table class="table align-middle">
+<thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="text-end">Amount</th><th></th></tr></thead><tbody>
+{% for t in txs %}<tr><td>{{ t.transaction_date }}</td><td>{{ t.description }}{% if t.notes %}<div class="small text-muted">{{ t.notes }}</div>{% endif %}</td><td>{{ t.category }}</td>
+<td><span class="badge {{ 'text-bg-success' if t.transaction_type=='Income' else 'text-bg-danger' }}">{{ t.transaction_type }}</span></td>
+<td class="text-end {{ 'amt-inc' if t.transaction_type=='Income' else 'amt-exp' }}">{{ t.amount|inr }}</td>
+<td class="text-end text-nowrap"><a class="btn btn-sm btn-light" href="{{ url_for('edit_transaction', tid=t.id) }}"><i class="bi bi-pencil"></i></a>
+<button class="btn btn-sm btn-light text-danger" data-bs-toggle="modal" data-bs-target="#confirmModal" data-action="{{ url_for('delete_transaction', tid=t.id) }}" data-label="{{ t.description }}"><i class="bi bi-trash"></i></button></td></tr>
+{% else %}<tr><td colspan="6" class="text-center text-muted py-4">No transactions match.</td></tr>{% endfor %}
+</tbody></table></div></div>{% endblock %}

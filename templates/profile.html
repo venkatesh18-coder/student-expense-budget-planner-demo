@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% block title %}Profile{% endblock %}
+{% block content %}<h2>Profile</h2><div class="row g-3">
+<div class="col-lg-6"><div class="card-box"><h5>Account</h5><p class="mb-1"><strong>Email:</strong> {{ user.email }}</p><p class="text-muted">Member since {{ user.created_at[:10] }}</p>
+<form method="post"><input type="hidden" name="action" value="name"><label class="form-label">Full name</label><input name="full_name" class="form-control mb-3" value="{{ user.full_name }}" required><button class="btn btn-brand">Update name</button></form></div></div>
+<div class="col-lg-6"><div class="card-box"><h5>Change password</h5><form method="post"><input type="hidden" name="action" value="password">
+<input type="password" name="current_password" class="form-control mb-2" placeholder="Current password" required>
+<input type="password" name="new_password" class="form-control mb-2" placeholder="New password (6+ characters)" required>
+<input type="password" name="confirm_password" class="form-control mb-3" placeholder="Confirm new password" required><button class="btn btn-brand">Change password</button></form></div></div></div>{% endblock %}

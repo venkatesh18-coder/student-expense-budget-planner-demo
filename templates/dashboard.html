@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4"><h2 class="mb-0">Dashboard</h2>
+<a href="{{ url_for('add_transaction') }}" class="btn btn-brand"><i class="bi bi-plus-lg"></i> Add transaction</a></div>
+{% for level, msg in alerts %}<div class="alert alert-{{ level }} py-2"><i class="bi bi-bell"></i> {{ msg }}</div>{% endfor %}
+<div class="row g-3 mb-4">
+{% for label, key, icon, cls in [('Total Income','income','bi-arrow-down-left','ico-a'),('Total Expenses','expense','bi-arrow-up-right','ico-b'),('Current Balance','balance','bi-bank','ico-c'),('Monthly Budget','budget','bi-calendar-check','ico-d'),('Remaining Budget','remaining','bi-hourglass-split','ico-e'),('Total Savings','savings','bi-piggy-bank','ico-f')] %}
+<div class="col-6 col-xl-4"><div class="card-box stat"><div class="ico {{ cls }}"><i class="bi {{ icon }}"></i></div><div><small>{{ label }}</small><strong>{{ stats[key]|inr }}</strong></div></div></div>
+{% endfor %}</div>
+<div class="row g-3 mb-4">
+<div class="col-lg-4"><div class="card-box"><h6>Expenses by category (this month)</h6><div class="chart-box"><canvas id="catChart"></canvas></div></div></div>
+<div class="col-lg-4"><div class="card-box"><h6>Income vs expense</h6><div class="chart-box"><canvas id="ieChart"></canvas></div></div></div>
+<div class="col-lg-4"><div class="card-box"><h6>Monthly spending trend</h6><div class="chart-box"><canvas id="trendChart"></canvas></div></div></div></div>
+<div class="card-box"><h5>Recent transactions</h5><div class="table-responsive"><table class="table align-middle mb-0">
+<thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th class="text-end">Amount</th></tr></thead><tbody>
+{% for t in recent %}<tr><td>{{ t.transaction_date }}</td><td>{{ t.description }}</td><td>{{ t.category }}</td>
+<td><span class="badge {{ 'text-bg-success' if t.transaction_type=='Income' else 'text-bg-danger' }}">{{ t.transaction_type }}</span></td>
+<td class="text-end {{ 'amt-inc' if t.transaction_type=='Income' else 'amt-exp' }}">{{ '+' if t.transaction_type=='Income' else '-' }}{{ t.amount|inr }}</td></tr>
+{% else %}<tr><td colspan="5" class="text-center text-muted py-4">No transactions yet. <a href="{{ url_for('add_transaction') }}">Add your first one</a>.</td></tr>{% endfor %}
+</tbody></table></div></div>
+<script id="chart-data" type="application/json">{{ chart|tojson }}</script>
+{% endblock %}
+{% block scripts %}<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script><script src="{{ url_for('static', filename='js/charts.js') }}"></script>{% endblock %}

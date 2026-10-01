@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block title %}Analysis{% endblock %}
+{% block content %}<h2>Analysis <small class="text-muted fs-6">{{ month_label }}</small></h2>
+<div class="row g-3 mb-3">
+<div class="col-md-6 col-xl-3"><div class="card-box"><small class="text-muted">Savings rate</small><div class="score fs-2">{{ '%.1f'|format(rate) }}%</div></div></div>
+<div class="col-md-6 col-xl-3"><div class="card-box"><small class="text-muted">Expense ratio</small><div class="score fs-2">{{ '%.1f'|format(ratio) }}%</div></div></div>
+<div class="col-md-6 col-xl-3"><div class="card-box"><small class="text-muted">Highest spending category</small><div class="score fs-2">{{ top or 'None yet' }}</div>{% if top %}<small>{{ top_amount|inr }}</small>{% endif %}</div></div>
+<div class="col-md-6 col-xl-3"><div class="card-box"><small class="text-muted">Financial health score</small><div class="score fs-2">{{ score }}/100</div>
+<div class="progress mt-2"><div class="progress-bar bg-{{ 'success' if score>=70 else 'warning' if score>=40 else 'danger' }}" style="width:{{ score }}%"></div></div></div></div></div>
+<div class="row g-3"><div class="col-lg-6"><div class="card-box h-100"><h5>Recommendations</h5><ul class="mb-0">{% for t in tips %}<li class="mb-1">{{ t }}</li>{% endfor %}</ul></div></div>
+<div class="col-lg-6"><div class="card-box h-100"><h5>Budget utilization</h5>{% for b in budgets %}<div class="d-flex justify-content-between small"><span>{{ b.category }}</span><span>{{ b.pct }}%</span></div><div class="progress mb-2"><div class="progress-bar bg-{{ b.color }}" style="width:{{ [b.pct,100]|min }}%"></div></div>{% else %}<p class="text-muted mb-0">No budgets set for this month.</p>{% endfor %}</div></div>
+<div class="col-12"><div class="card-box"><h5>How the score works</h5><p class="small mb-2">Score = Savings rate (40) + Expense ratio (20) + Budget usage (20) + Overspending (20). Yours: {% for k,v in parts.items() %}{{ k }} {{ v }}{{ ', ' if not loop.last }}{% endfor %}.</p>
+<p class="small text-muted mb-0">Savings rate = (Income − Expenses) ÷ Income × 100. Expense ratio = Expenses ÷ Income × 100. Rule-based and for learning only, not financial advice. See README for full formula.</p></div></div></div>{% endblock %}
